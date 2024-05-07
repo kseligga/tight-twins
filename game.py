@@ -1,4 +1,6 @@
+import os
 import random
+import subprocess
 
 from settings import Difficulty, Display
 
@@ -11,6 +13,8 @@ def alphabet(display, len): # funkcja do tworzenia alfabetu (listy) na podstawie
         return # nie uzywac, cos tu grzebalem ale nie moge zrobic na szybko tego co chce zrobic
     if display == Display.MIXED:
         return # to samo
+
+
 
 # przebieg pojedynczej gry
 class Game():
@@ -29,6 +33,8 @@ class Game():
 
 
     def display_current_state(self):
+        os.system('cls') # trzeba startować z terminala, żeby ładnie czyściło (dla linux trzeba 'clear')
+        subprocess.call(["python", "silly-title.py"])
         print("-----------------------------------------")
         w = self.current_word
         self.current_word_length = len(str(w))
@@ -142,9 +148,11 @@ class Game():
 
             if self.game_state==1:
                 print("Brawo graczu! Wygrales! （〜^∇^ )〜")
+                input("Wciśnij dowolny przycisk, aby kontynuować...")
                 break
             if self.game_state==-1:
                 print("Przegrales graczu (╯°□°)╯︵ ┻━┻ ale za to komputer wygral")
+                input("Wciśnij dowolny przycisk, aby kontynuować...")
                 break
 
 

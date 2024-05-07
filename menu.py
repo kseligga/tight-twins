@@ -1,4 +1,5 @@
 import subprocess
+import os
 from enum import Enum
 
 from game import Game
@@ -27,6 +28,7 @@ class Menu:
         print("1. Zmień poziom trudności")
         print("2. Zmień ustawienia wyświetlania")
         print("3. Zmień do ilu wygranych gier")
+        print("4. Powrót")
         choice = input("Wybierz opcję: ")
         if choice == '1':
             print("Obecny poziom trudności: ", self.settings['difficulty'])  # TODO repr jakis z tego enuma
@@ -52,6 +54,8 @@ class Menu:
                 print("Zmieniono liczbę gier do wygrania na ", towin_set)
             except:
                 print("❌ Nieprawidłowe ustawienia. Spróbuj ponownie.")
+        elif choice == '4':
+            pass
         else:
             print("❌ Nieznana opcja, spróbuj ponownie.")
 
@@ -73,8 +77,9 @@ class Menu:
 
 
     def start(self):
-        subprocess.call(["python", "silly-title.py"])
         while True:
+            os.system('cls')
+            subprocess.call(["python", "silly-title.py"])
             self.display_menu()
             choice = input("Wybierz opcję: ")
             if choice == '1':
