@@ -62,9 +62,31 @@ class Game():
         new_letter = str(random.choice(self.alphabet))
         self.current_word = s[:idx-1] + new_letter + s[idx-1:]
 
+    def twin_exist(self):
+        word = self.current_word
+        for i in range(len(word)):
+            for j in range(i+1, len(word)+1):
+                subword = word[i:j]
+                counters = {}
+                for el in subword:
+                    if el in counters:
+                        counters[el] += 1
+                    else:
+                        counters[el] = 1
+                flag = False
+                for count in counters.values():
+                    if count%2 == 1:
+                        flag = True
+                        break
+                if flag:
+                    continue
+                return True # TODO dokładne sprawdzanie
+        return False
+
+
 
     def check_game_state(self):
-        if self.current_word == "xxx": # TODO tu warunek na wystąpienie ciasnych bliźniaków w słowie
+        if self.twin_exist == True: # TODO tu warunek na wystąpienie ciasnych bliźniaków w słowie
             self.game_state = 1 # wystapil blizniak - wygrywa gracz
 
         if self.moves_to_end <= 0:
