@@ -80,7 +80,45 @@ class Game():
                         break
                 if flag:
                     continue
-                return True # TODO dokładne sprawdzanie
+                # Autorski algorytm sprawdzania czy w słowie istnieją bliźniaki (jeśli kazdy znak występuje parzystą ilość razy)                
+                choiceList = [0 for _ in range(len(subword))]  
+                '''
+                0 - domyślnie i wstawione do 1 słowa bez mozliwości wyboru 
+                1 - wstawione do 1 słowa gdy był wybór 
+                2 - wstawione do 2 słowa gdy był wybór
+                -2 - wstawione do 2 słowa gdy nie było innej opcji
+                '''
+                flag2 = True
+                s1 = subword[0]
+                s2 = ""
+                while flag2:
+                    for i in range(len(s1) + len(s2), len(subword)):
+                        letter = subword[i]
+                        k = len(s2)
+                        neededLetter = s1[k]
+                        if letter == neededLetter: # Mozna dodać literę do 2 słowa
+                            s2 += letter
+                            if s1.count(letter) < counters[letter]/2: 
+                                choiceList[i] = 2
+                            else:
+                                choiceList[i] = -2
+                        elif s1.count(letter) < counters[letter]/2: # Mozna dodać literę do 1 słowa
+                            s1 += letter
+                        elif 2 in choiceList: # Nie mozna dodać litery do zadnego ze słów - przygotowanie do kolejnej iteracji
+                            last2Index = max(i for i in reversed(range(len(choiceList))) if choiceList[i] == 2)
+                            newLengthS2 = len(s2) - choiceList[last2Index:].count(-2) - 1
+                            newLengthS1 = last2Index - newLengthS2 # chyba git ale moze byc zle
+                            s1 = s1[:newLengthS1] + subword[last2Index]
+                            s2 = s2[:newLengthS2]
+                            choiceList[last2Index] = 1
+                            for j in range(last2Index + 1, len(choiceList)):
+                                choiceList[j] = 0
+                            break
+                        else:
+                            flag2 = False # Nie mozna dodać litery do zadnego ze słów oraz nie ma juz gdzie się cofnąć
+                            break
+                    if s1 == s2:
+                        return True
         return False
 
 
