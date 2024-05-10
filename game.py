@@ -130,7 +130,7 @@ class Game():
 
 
     def check_game_state(self):
-        if self.twin_exist == True: # TODO tu warunek na wystąpienie ciasnych bliźniaków w słowie
+        if self.twin_exist() == True: # TODO tu warunek na wystąpienie ciasnych bliźniaków w słowie
             self.game_state = 1 # wystapil blizniak - wygrywa gracz
 
         if self.moves_to_end <= 0:
