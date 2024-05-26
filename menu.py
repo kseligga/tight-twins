@@ -3,6 +3,7 @@ import os
 from enum import Enum
 from time import sleep
 
+import settings
 import title
 from game import Game
 from settings import Difficulty, Display
@@ -19,9 +20,9 @@ class Menu:
 
     def display_menu(self):
         print("-----------------------------------------")
-        print("1. Instrukcja gry")
+        print("1. Graj")
         print("2. Ustawienia gry")
-        print("3. Graj")
+        print("3. Instrukcja gry")
         print("4. Wyjdź")
         print("-----------------------------------------")
 
@@ -34,7 +35,7 @@ class Menu:
         print("-----------------------------------------")
         print("1. Zmień poziom trudności")
         print("2. Zmień ustawienia wyświetlania")
-        print("3. Zmień do ilu wygranych gier")
+        print("3. Zmień do ilu wygranych rund")
         print("4. Powrót")
         print("-----------------------------------------")
         choice = input("Wybierz opcję: ")
@@ -43,7 +44,7 @@ class Menu:
             while True:
                 print("Obecny poziom trudności: ", self.settings['difficulty'].value)
                 try:
-                    difficulty_set = Difficulty(input("Podaj nowy poziom trudności [easy/medium/hard]: "))
+                    difficulty_set = Difficulty(input("Podaj nowy poziom trudności [silly/easy/medium/hard]: "))
                     self.settings['difficulty'] = difficulty_set
                     print("Zmieniono poziom trudności na: ", difficulty_set.value)
                     break
@@ -54,9 +55,12 @@ class Menu:
             print("Obecne ustawienie wyświetlania: ", self.settings['display'].value)
             while True:
                 try:
-                    display_set = Display(input("Podaj nowe ustawienia wyświetlania [numbers/letters/emoji/mixed]: "))
+                    display_set = Display(input("Podaj nowe ustawienia wyświetlania [letters/digits/custom]: "))
                     self.settings['display'] = display_set
-                    print("Zmieniono wyświetlanie na: ", display_set.value)
+                    if display_set == Display.CUSTOM:
+                        print("Zmieniono wyświetlanie na: custom. Własny alfabet wpiszesz tuż przed grą.")
+                    else:
+                        print("Zmieniono wyświetlanie na: ", display_set.value)
                     break
                 except:
                     print("X Nieprawidłowe ustawienia. Spróbuj ponownie.")
@@ -64,7 +68,7 @@ class Menu:
         elif choice == '3':
             print("Obecna liczba rund potrzebna do wygrania: ", self.settings['games_to_win'])
             while True:
-                tw = input("Podaj nową liczbę gier do wygrania: ")
+                tw = input("Podaj nową liczbę rund do wygrania: ")
                 try:
                     towin_set = int(tw)
                     if towin_set >= 1:
@@ -85,26 +89,38 @@ class Menu:
             input("Wpisz dowolną wartość aby kontynuować...")
 
     def display_settings(self):
+        print("-----------------------------------------")
+        print("Obecne ustawienia:")
         print(f"Poziom trudności: {self.settings['difficulty'].value}")
         print(f"Ustawienia wyświetlania: {self.settings['display'].value}")
-        print(f"Do ilu wygranych gier: {self.settings['games_to_win']}")
+        print(f"Do ilu wygranych rund: {self.settings['games_to_win']}")
 
     def play_game(self):
         print("-----------------------------------------")
         print("Rozpoczynamy grę!")
         self.score = [0, 0]
         while True:
+            if self.settings['display'] == settings.Display.CUSTOM:
+                alphabet_len = None
+                break
             a = input("Podaj długość używanego alfabetu: ")
             try:
                 a = int(a)
                 if a <= 1:
                     print("Wpisz wartość większą od 1.")
                     continue
+                if a > 128:
+                    print("Bez przesady. Wpisz mniejszą wartość.")
+                    continue
                 else:
                     alphabet_len = a
-                    if alphabet_len > 26 and self.settings['display']== Display.LETTERS:
+                    if alphabet_len > 10 and self.settings['display']== Display.DIGITS:
                         print("Duża długość alfabetu - automatycznie zmieniono ustawienia wyświetlania")
-                        self.settings['display'] = Display.NUMBERS
+                        self.settings['display'] = Display.LETTERS
+                    if alphabet_len > 52:
+                        print("Przy obecnej długości alfabetu, zostaną użyte symbole, cyfry i litery.")
+                    elif alphabet_len > 26:
+                        print("Przy obecnej długości alfabetu, wielkie i małe litery będą odróżnialne.")
                     break
             except:
                 print("Wpisz prawidłową wartość")
@@ -117,6 +133,8 @@ class Menu:
                 if e <= 0:
                     print("Wpisz dodatnią wartość")
                     continue
+                elif e > 99:
+                    print("Bez przesady. Wpisz mniejszą wartość.")
                 else:
                     end_len = e
                     break
@@ -125,7 +143,7 @@ class Menu:
                 continue
 
         # gramy
-        while all(x < self.settings['games_to_win'] for x in self.score):
+        while self.score[0] < self.settings['games_to_win'] and self.score[1] < self.settings['games_to_win']:
             current_game = Game(self.settings, alphabet_len, end_len)
             res = current_game.play() # tu zaczynamy grac - cala gra w game.py
             if res == 1:
@@ -133,9 +151,11 @@ class Menu:
             elif res == -1:
                 self.score[1] += 1
             if self.settings['games_to_win'] > 1:  # dla jednorundowej gry bez obsługi rund
+                print("-----------------------------------------")
                 print("Obecny wynik: Gracz ", str(self.score[0]), "-", str(self.score[1]), " Komputer")
                 input("Wpisz dowolną wartość aby kontynuować...")
 
+        print("-----------------------------------------")
         print("Gra skończona!")
         again = input("Jeśli chcesz zagrać znowu z tymi samymi ustawieniami, wpisz 1. Aby wrócić do menu, "
                       "wpisz dowolną inną wartość:")
@@ -150,11 +170,12 @@ class Menu:
             self.display_menu()
             choice = input("Wybierz opcję: ")
             if choice == '1':
-                self.display_instructions()
+                self.play_game()
             elif choice == '2':
+                self.display_settings()
                 self.change_settings()
             elif choice == '3':
-                self.play_game()
+                self.display_instructions()
             elif choice == '4':
                 exit()
             else:

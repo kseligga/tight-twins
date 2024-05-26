@@ -10,11 +10,27 @@ import title
 from settings import Difficulty, Display
 
 
-def alphabet(display, len):  # funkcja do tworzenia alfabetu (listy) na podstawie ustawien
-    if display == Display.NUMBERS:
-        return list(range(1, len + 1))
+def alphabet(display, leng):  # funkcja do tworzenia alfabetu (listy) na podstawie ustawien
+    if display == Display.DIGITS:  # do 10 cyfr
+        return [str(i) for i in range(1, leng + 1)]
+
     if display == Display.LETTERS:
-        return list(map(chr, range(97, 97 + len)))
+        if leng <= 26:
+            return list(map(chr, range(97, 97 + leng)))
+        elif leng <= 52:  # przy dużym alfabecie odróżniamy wielkie litery
+            lowers = list(map(chr, range(97, 123)))
+            uppers = list(map(chr, range(65, 65 + leng - 26)))
+            return lowers + uppers
+        else:  # przy bardzo dużym alfabecie włączamy też symbole
+            return list(map(chr, range(33, 33 + leng)))
+
+    if display == Display.CUSTOM:
+        alphabet = str(input("Podaj własny alfabet (bez spacji i przecinków, np. 'abcdef'): "))
+        while len(set(alphabet))<=1:
+            alphabet = str(input("Podaj własny alfabet o długości powyżej 1: "))
+        a = list(set([x for x in alphabet]))
+        return a
+
 
 
 # przebieg pojedynczej gry
@@ -44,8 +60,11 @@ class Game():
         display_word = ' _' + '_'.join(list(str(w))) + '_ '
         print(display_word)
 
-        display_gaps = ' ' + ' '.join(str(i) for i in range(1, len(str(w)) + 2))
+        display_gaps = ' '+' '.join(str(i) if i < 10 else str(i // 10) for i in range(1, len(str(w)) + 2))
         print(display_gaps)
+        if len(w)>=9:
+            second_digit = ' '+' '.join(' ' if i < 10 else str(i % 10) for i in range(1, len(str(w)) + 2))
+            print(second_digit)
 
         print("")
         print("Obecna długość słowa: ", self.current_word_length)
@@ -53,10 +72,12 @@ class Game():
             print("Komputer zwycięży za ", self.moves_to_end, " kolejek bez ciasnych bliźniaków")
 
     def player_move(self):
-        try:
-            self.curr_chosen_place = int(input("Wybierz miejsce, gdzie komputer ma wstawić literę: "))
-        except:
-            print("Wpisz wartość liczbową")
+        while True:
+            try:
+                self.curr_chosen_place = int(input("Wybierz miejsce, gdzie komputer ma wstawić literę: "))
+                break
+            except:
+                print("Wpisz wartość liczbową")
         while self.curr_chosen_place not in range(1, self.current_word_length + 2):
             print("Wpisz liczbę z przedziału ( 1, ", str(self.current_word_length+1), ")")
             try:
@@ -270,8 +291,8 @@ class Game():
                     s+=word[i]
                 case 2:
                     s+=word[i].upper()
-        print("word - " + word)
-        print("twins- " + s)
+        print("Końcowe słowo: " + word)
+        print("    Bliźniaki: " + s)
 
 
 
@@ -286,10 +307,13 @@ class Game():
             self.display_current_state()
 
             if self.game_state == 1:
-                print("Brawo graczu! Wygrałeś! （〜^∇^ )〜")
+                print("-----------------------------------------")
+                print("Brawo graczu! Wygrałeś! (~^v^ )~")
+                print("-----------------------------------------")
                 self.printTwins()
                 break
             if self.game_state == -1:
+                print("-----------------------------------------")
                 print("Przegrałeś graczu (╯°□°)╯ ┻━┻ Komputer był lepszy...")
                 break
 

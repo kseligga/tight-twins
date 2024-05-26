@@ -9,6 +9,5 @@ class Difficulty(Enum):
 
 class Display(Enum):
     LETTERS = 'letters'
-    NUMBERS = 'numbers'
-    EMOJI = 'emoji'
-    MIXED = 'mixed'
+    DIGITS = 'digits'
+    CUSTOM = 'custom'
