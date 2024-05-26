@@ -2,9 +2,11 @@ import os
 import random
 import subprocess
 import copy
+from time import sleep
 
 import numpy as np
 
+import title
 from settings import Difficulty, Display
 
 
@@ -13,10 +15,6 @@ def alphabet(display, len):  # funkcja do tworzenia alfabetu (listy) na podstawi
         return list(range(1, len + 1))
     if display == Display.LETTERS:
         return list(map(chr, range(97, 97 + len)))
-    if display == Display.EMOJI:
-        return  # nie uzywac, cos tu grzebalem ale nie moge zrobic na szybko tego co chce zrobic
-    if display == Display.MIXED:
-        return  # to samo
 
 
 # przebieg pojedynczej gry
@@ -35,8 +33,9 @@ class Game():
         self.curr_chosen_place = None
 
     def display_current_state(self):
-        os.system('cls')  # trzeba startować z terminala, żeby ładnie czyściło (dla linux trzeba 'clear')
-        subprocess.call(["python", "silly-title.py"])
+        # trzeba startować z terminala, żeby ładnie czyściło
+        os.system('cls' if os.name == 'nt' else 'clear')  # obsługa win i linuxa
+        title.display()
         print("-----------------------------------------")
         w = self.current_word
         self.current_word_length = len(str(w))
@@ -53,14 +52,26 @@ class Game():
             print("Komputer zwycięży za ", self.moves_to_end, " kolejek bez ciasnych bliźniaków")
 
     def player_move(self):
-        self.curr_chosen_place = int(input("Wybierz miejsce, gdzie komputer ma wstawić literę: "))
-        while self.curr_chosen_place not in range(1, self.current_word_length + 2):
-            print("Wybierz prawidłową wartość.")
+        try:
             self.curr_chosen_place = int(input("Wybierz miejsce, gdzie komputer ma wstawić literę: "))
+        except:
+            print("Wpisz wartość liczbową")
+        while self.curr_chosen_place not in range(1, self.current_word_length + 2):
+            print("Wpisz liczbę z przedziału ( 1, ", str(self.current_word_length+1), ")")
+            try:
+                self.curr_chosen_place = int(input("Wybierz miejsce, gdzie komputer ma wstawić literę: "))
+            except:
+                print("Wpisz wartość liczbową")
 
     def computer_move(self):
-        # inteligentny_algorytm(self.current_word, self.curr_chosen_place) #TODO algorytmy dla komputera
-        self.dumb_algorithm()
+        if self.difficulty == Difficulty.EASY:
+            self.algorithm_1()
+        elif self.difficulty == Difficulty.MEDIUM:
+            self.algorithm_2()
+        elif self.difficulty == Difficulty.HARD:
+            self.algorithm_3()
+        elif self.difficulty == Difficulty.SILLY:
+            self.dumb_algorithm()
 
     def dumb_algorithm(self):  # wstawia losowa litere
         idx = self.curr_chosen_place - 1
@@ -142,12 +153,12 @@ class Game():
 
 
     def is_twin(self, add_pos=-1, add_letter=""):
-        word = self.current_word
+        word = str(self.current_word)
         if type(add_pos) == int and add_pos >= 0:
-            word = word[:add_pos] + add_letter + word[add_pos:]
+            word = str(word[:add_pos]) + add_letter + str(word[add_pos:])
         if type(add_pos) == tuple:
             for i in range(len(add_pos)):
-                word = word[:add_pos[i]] + add_letter[i] + word[add_pos[i]:]
+                word = str(word[:add_pos[i]]) + add_letter[i] + str(word[add_pos[i]:])
         return self.twin_exist(word)
 
     @staticmethod
@@ -176,6 +187,16 @@ class Game():
                 flag, counters = Game.chars_even(subword)
                 if not flag:
                     continue
+
+                # fragment kodu z poprzedniej wersji, w nowej subword i counters nie byly zdefiniowane (sa używane dalej)
+                subword = str(word[i:j])
+                counters={}
+                for el in subword:
+                    if el in counters:
+                        counters[el] += 1
+                    else:
+                        counters[el] = 1
+
                 # Autorski algorytm sprawdzania czy w słowie istnieją bliźniaki (jeśli kazdy znak występuje parzystą ilość razy)                
                 choiceList = [0 for _ in range(len(subword))]
                 '''
@@ -221,7 +242,8 @@ class Game():
                         2 jeśli należy do drugiego bliźniaka
                         '''
                         pos = [0 for i in range(len(word))]
-                        for e in range(i, j):
+
+                        for e in range(i, j): # TODO tu są błędy!
                             pos[e] = Game.decode(choiceList[e - i])
                         return True, pos
         return False, None
@@ -237,7 +259,7 @@ class Game():
                 return 0
 
     def check_game_state(self):
-        if self.is_twin() == True:  # TODO tu warunek na wystąpienie ciasnych bliźniaków w słowie
+        if self.is_twin() == True:
             self.game_state = 1  # wystapil blizniak - wygrywa gracz
 
         if self.moves_to_end <= 0:
@@ -253,12 +275,10 @@ class Game():
             self.display_current_state()
 
             if self.game_state == 1:
-                print("Brawo graczu! Wygrales! （〜^∇^ )〜")
-                input("Wciśnij dowolny przycisk, aby kontynuować...")
+                print("Brawo graczu! Wygrałeś! （〜^∇^ )〜")
                 break
             if self.game_state == -1:
-                print("Przegrales graczu (╯°□°)╯︵ ┻━┻ ale za to komputer wygral")
-                input("Wciśnij dowolny przycisk, aby kontynuować...")
+                print("Przegrałeś graczu (╯°□°)╯ ┻━┻ Komputer był lepszy...")
                 break
 
             self.player_move()
