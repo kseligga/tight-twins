@@ -130,7 +130,7 @@ class Game():
                 dists.pop(pos)
                 if len(dists) == 0:
                     self.current_word = s[:idx] + str(letters[0]) + s[idx:]
-                    return 
+                    return
                 continue
             else:
                 self.current_word = s[:idx] + str(letters[pos]) + s[idx:]
@@ -166,13 +166,14 @@ class Game():
             if count % 2 == 1:
                 flag = True
                 break
-        return not flag
+        return not flag, counters
 
     @staticmethod
     def twin_exist(word):
         for i in range(len(word)):
             for j in range(i + 1, len(word) + 1):
-                flag = Game.chars_even(word[i:j])
+                subword = word[i:j]
+                flag, counters = Game.chars_even(subword)
                 if not flag:
                     continue
                 # Autorski algorytm sprawdzania czy w słowie istnieją bliźniaki (jeśli kazdy znak występuje parzystą ilość razy)                
@@ -221,7 +222,7 @@ class Game():
                         '''
                         pos = [0 for i in range(len(word))]
                         for e in range(i, j):
-                            pos[e] = self.decode(choiceList[e - i])
+                            pos[e] = Game.decode(choiceList[e - i])
                         return True, pos
         return False, None
 
