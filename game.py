@@ -29,6 +29,7 @@ class Game():
         self.moves_to_end = self.end_len - self.current_word_length
 
         self.game_state = 0
+        self.twin = []
 
         self.curr_chosen_place = None
 
@@ -188,14 +189,6 @@ class Game():
                 if not flag:
                     continue
 
-                # fragment kodu z poprzedniej wersji, w nowej subword i counters nie byly zdefiniowane (sa używane dalej)
-                subword = str(word[i:j])
-                counters={}
-                for el in subword:
-                    if el in counters:
-                        counters[el] += 1
-                    else:
-                        counters[el] = 1
 
                 # Autorski algorytm sprawdzania czy w słowie istnieją bliźniaki (jeśli kazdy znak występuje parzystą ilość razy)                
                 choiceList = [0 for _ in range(len(subword))]
@@ -209,20 +202,20 @@ class Game():
                 s1 = subword[0]
                 s2 = ""
                 while flag2:
-                    for i in range(len(s1) + len(s2), len(subword)):
-                        letter = subword[i]
+                    for v in range(len(s1) + len(s2), len(subword)):
+                        letter = subword[v]
                         k = len(s2)
                         neededLetter = s1[k]
                         if letter == neededLetter:  # Mozna dodać literę do 2 słowa
                             s2 += letter
                             if s1.count(letter) < counters[letter] / 2:
-                                choiceList[i] = 2
+                                choiceList[v] = 2
                             else:
-                                choiceList[i] = -2
+                                choiceList[v] = -2
                         elif s1.count(letter) < counters[letter] / 2:  # Mozna dodać literę do 1 słowa
                             s1 += letter
                         elif 2 in choiceList:  # Nie mozna dodać litery do zadnego ze słów - przygotowanie do kolejnej iteracji
-                            last2Index = max(i for i in reversed(range(len(choiceList))) if choiceList[i] == 2)
+                            last2Index = max(x for x in range(len(choiceList)) if choiceList[x] == 2)
                             newLengthS2 = len(s2) - choiceList[last2Index:].count(-2) - 1
                             newLengthS1 = last2Index - newLengthS2  # chyba git ale moze byc zle
                             s1 = s1[:newLengthS1] + subword[last2Index]
@@ -241,9 +234,8 @@ class Game():
                         1 jeśli należy do pierwszego bliźniaka
                         2 jeśli należy do drugiego bliźniaka
                         '''
-                        pos = [0 for i in range(len(word))]
-
-                        for e in range(i, j): # TODO tu są błędy!
+                        pos = [0 for _ in range(len(word))]
+                        for e in range(i, j):
                             pos[e] = Game.decode(choiceList[e - i])
                         return True, pos
         return False, None
@@ -253,17 +245,36 @@ class Game():
         match x:
             case 0 | 1:
                 return 1
-            case 2 | -1:
+            case 2 | -2:
                 return 2
             case _:
                 return 0
 
     def check_game_state(self):
-        if self.is_twin() == True:
+        is_twin, self.twin = self.is_twin()
+        if is_twin == True:
             self.game_state = 1  # wystapil blizniak - wygrywa gracz
 
         if self.moves_to_end <= 0:
             self.game_state = -1  # skonczyl sie czas - wygral komputerek
+
+    def printTwins(self):
+        pos = self.twin
+        word = str(self.current_word)
+        s = ''
+        for i in range(len(pos)):
+            match pos[i]:
+                case 0:
+                    s+='_'
+                case 1:
+                    s+=word[i]
+                case 2:
+                    s+=word[i].upper()
+        print("word - " + word)
+        print("twins- " + s)
+
+
+
 
     def play(self):
         self.current_word = random.choice(self.alphabet)  # pierwsza litera losowa
@@ -276,6 +287,7 @@ class Game():
 
             if self.game_state == 1:
                 print("Brawo graczu! Wygrałeś! （〜^∇^ )〜")
+                self.printTwins()
                 break
             if self.game_state == -1:
                 print("Przegrałeś graczu (╯°□°)╯ ┻━┻ Komputer był lepszy...")
