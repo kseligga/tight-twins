@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class Difficulty(Enum):
-    SILLY = 'silly'
     EASY = 'easy'
     MEDIUM = 'medium'
     HARD = 'hard'
+    HARDER = 'harder'
 
 class Display(Enum):
     LETTERS = 'letters'

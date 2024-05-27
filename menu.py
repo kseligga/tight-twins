@@ -44,7 +44,7 @@ class Menu:
             while True:
                 print("Obecny poziom trudności: ", self.settings['difficulty'].value)
                 try:
-                    difficulty_set = Difficulty(input("Podaj nowy poziom trudności [silly/easy/medium/hard]: "))
+                    difficulty_set = Difficulty(input("Podaj nowy poziom trudności [easy/medium/hard/harder]: "))
                     self.settings['difficulty'] = difficulty_set
                     print("Zmieniono poziom trudności na: ", difficulty_set.value)
                     break

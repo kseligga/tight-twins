@@ -87,13 +87,13 @@ class Game():
 
     def computer_move(self):
         if self.difficulty == Difficulty.EASY:
-            self.algorithm_1()
-        elif self.difficulty == Difficulty.MEDIUM:
-            self.algorithm_2()
-        elif self.difficulty == Difficulty.HARD:
-            self.algorithm_3()
-        elif self.difficulty == Difficulty.SILLY:
             self.dumb_algorithm()
+        elif self.difficulty == Difficulty.MEDIUM:
+            self.algorithm_1()
+        elif self.difficulty == Difficulty.HARD:
+            self.algorithm_2()
+        elif self.difficulty == Difficulty.HARDER:
+            self.algorithm_3()
 
     def dumb_algorithm(self):  # wstawia losowa litere
         idx = self.curr_chosen_place - 1
@@ -102,13 +102,14 @@ class Game():
         self.current_word = s[:idx] + new_letter + s[idx:]
 
     def algorithm_1(self):
+        print("ALG 1")
         # Próbuje wstawić losowo literę, jeśli tworzy to bliźniaka to losuje ponownie
         idx = self.curr_chosen_place - 1
         s = str(self.current_word)
         letters = copy.deepcopy(self.alphabet)
         random.shuffle(letters)
         i = 0
-        while i < len(letters) and self.is_twin(idx, str(letters[i])):
+        while i < len(letters) and self.is_twin(idx, str(letters[i]))[0] == True:
             i += 1
         if i == len(letters):
             i = 0
@@ -129,6 +130,7 @@ class Game():
             for i in range(len(word)):
                 for j in range(i + 1, len(word) + 1):
                     flag = Game.chars_even(word[i:j])
+                    print(flag)
                     if flag:
                         break
                 if flag:
@@ -136,7 +138,7 @@ class Game():
             if not flag:
                 self.current_word = s[:idx] + str(letter) + s[idx:]
                 return
-        self.algorithm_1()
+        self.algorithm_1() # TODO zwraca tylko wywołanie alg1!
 
 
     def algorithm_3(self):
@@ -159,7 +161,7 @@ class Game():
                 pos = dists.index(-1)
             except:
                 pos = np.argmax(dists)
-            if self.is_twin(idx, str(letters[pos])):
+            if self.is_twin(idx, str(letters[pos]))[0]:
                 dists.pop(pos)
                 if len(dists) == 0:
                     self.current_word = s[:idx] + str(letters[0]) + s[idx:]
@@ -319,5 +321,6 @@ class Game():
 
             self.player_move()
             self.computer_move()
+            #sleep(3)
 
         return (self.game_state)
