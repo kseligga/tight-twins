@@ -102,14 +102,13 @@ class Game():
         self.current_word = s[:idx] + new_letter + s[idx:]
 
     def algorithm_1(self):
-        print("ALG 1")
         # Próbuje wstawić losowo literę, jeśli tworzy to bliźniaka to losuje ponownie
         idx = self.curr_chosen_place - 1
         s = str(self.current_word)
         letters = copy.deepcopy(self.alphabet)
         random.shuffle(letters)
         i = 0
-        while i < len(letters) and self.is_twin(idx, str(letters[i]))[0] == True:
+        while i < len(letters) and self.is_twin(idx, str(letters[i]))[0]:
             i += 1
         if i == len(letters):
             i = 0
@@ -129,8 +128,7 @@ class Game():
             word = s[:idx] + str(letter) + s[idx:]
             for i in range(len(word)):
                 for j in range(i + 1, len(word) + 1):
-                    flag = Game.chars_even(word[i:j])
-                    print(flag)
+                    flag = Game.chars_even(word[i:j])[0]
                     if flag:
                         break
                 if flag:
@@ -138,7 +136,7 @@ class Game():
             if not flag:
                 self.current_word = s[:idx] + str(letter) + s[idx:]
                 return
-        self.algorithm_1() # TODO zwraca tylko wywołanie alg1!
+        self.algorithm_1()
 
 
     def algorithm_3(self):
@@ -170,9 +168,6 @@ class Game():
             else:
                 self.current_word = s[:idx] + str(letters[pos]) + s[idx:]
                 return
-
-
-
 
 
 
@@ -321,6 +316,6 @@ class Game():
 
             self.player_move()
             self.computer_move()
-            #sleep(3)
+            sleep(3)
 
         return (self.game_state)

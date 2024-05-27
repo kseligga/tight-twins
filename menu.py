@@ -13,7 +13,7 @@ class Menu:
     def __init__(self):
         self.score = [0, 0]
         self.settings = {
-            'difficulty': Difficulty.EASY,
+            'difficulty': Difficulty.MEDIUM,
             'display': Display.LETTERS,
             'games_to_win': 1
         }
