@@ -15,7 +15,8 @@ class Menu:
         self.settings = {
             'difficulty': Difficulty.MEDIUM,
             'display': Display.LETTERS,
-            'games_to_win': 1
+            'games_to_win': 1,
+            'skipsingles': False
         }
 
     def display_menu(self):
@@ -51,7 +52,8 @@ class Menu:
         print("1. Zmień poziom trudności")
         print("2. Zmień ustawienia wyświetlania")
         print("3. Zmień do ilu wygranych rund")
-        print("4. Powrót")
+        print("4. Zmień uwzględnianie pojedynczych bliźniaków")
+        print("5. Powrót")
         print("-----------------------------------------")
         choice = input("Wybierz opcję: ")
         print("-----------------------------------------")
@@ -97,18 +99,35 @@ class Menu:
                     print("X Nieprawidłowe ustawienia. Spróbuj ponownie.")
                     continue
         elif choice == '4':
+            print("Gdy ustawisz pomijanie pojedynczych bliźniaków, jako bliźniak nie będą już traktowane pojedyncze litery, np. 'aa'.")
+            print("Takie ustawienie urozmaici i lekko utrudni rozgrywkę.")
+            print("Obecne ustawienie pomijania pojedynczych bliźniaków: ", self.settings['skipsingles'])
+            while True:
+                tn = str(input("Chcesz aby pomijać pojedyncze bliźniaki? [tak/nie]: "))
+                if tn != 'tak' and tn != 'nie':
+                    print("Wpisz poprawną wartość.")
+                    continue
+                if tn == 'tak':
+                    self.settings['skipsingles'] = True
+                if tn == 'nie':
+                    self.settings['skipsingles'] = False
+                print("Pomyślnie zmieniono ustawienia.")
+                break
+
+        elif choice == '5':
             pass
         else:
             print("X Nieznana opcja, spróbuj ponownie.")
-        if choice!='4':
+        if choice!='5':
             input("Wpisz dowolną wartość aby kontynuować...")
 
     def display_settings(self):
         print("-----------------------------------------")
         print("Obecne ustawienia:")
-        print(f"Poziom trudności: {self.settings['difficulty'].value}")
-        print(f"Ustawienia wyświetlania: {self.settings['display'].value}")
-        print(f"Do ilu wygranych rund: {self.settings['games_to_win']}")
+        print(f"Poziom trudności:                  {self.settings['difficulty'].value}")
+        print(f"Ustawienia wyświetlania:           {self.settings['display'].value}")
+        print(f"Pomijanie pojedynczych bliźniaków: {self.settings['skipsingles']}")
+        print(f"Do ilu wygranych rund:             {self.settings['games_to_win']}")
 
     def play_game(self):
         print("-----------------------------------------")

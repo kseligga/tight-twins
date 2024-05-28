@@ -39,6 +39,7 @@ class Game():
         self.difficulty = settings['difficulty']
         self.end_len = end_len
         self.alphabet = alphabet(settings['display'], alphabet_len)
+        self.skipsingles = settings['skipsingles']
 
         self.current_word = ""
         self.current_word_length = 0
@@ -178,7 +179,7 @@ class Game():
         if type(add_pos) == tuple:
             for i in range(len(add_pos)):
                 word = str(word[:add_pos[i]]) + add_letter[i] + str(word[add_pos[i]:])
-        return self.twin_exist(word)
+        return self.twin_exist(word, self.skipsingles)
 
     @staticmethod
     def chars_even(subword):
@@ -199,10 +200,12 @@ class Game():
         return not flag, counters
 
     @staticmethod
-    def twin_exist(word):
+    def twin_exist(word, skipsingles):
         for i in range(len(word)):
             for j in range(i + 1, len(word) + 1):
                 subword = word[i:j]
+                if skipsingles and len(subword)<=2:
+                    continue
                 flag, counters = Game.chars_even(subword)
                 if not flag:
                     continue
@@ -223,6 +226,8 @@ class Game():
                     for v in range(len(s1) + len(s2), len(subword)):
                         letter = subword[v]
                         k = len(s2)
+                        if skipsingles and len(s1)==1 and s1==s2:
+                            continue
                         neededLetter = s1[k]
                         if letter == neededLetter:  # Mozna dodać literę do 2 słowa
                             s2 += letter
@@ -316,6 +321,6 @@ class Game():
 
             self.player_move()
             self.computer_move()
-            sleep(3)
+            #sleep(3)
 
         return (self.game_state)
