@@ -28,7 +28,22 @@ class Menu:
 
     def display_instructions(self):
         print("-----------------------------------------")
-        print("Tutaj będą wyświetlane instrukcje gry...") # TODO instrukcja
+        print("Jako gracz twoim celem jest utworzenie ciasnego bliźniaka w słowie")
+        print("W każdym ruchu masz możliwość wyboru pozycji, na której komputer wstawia jedną z liter z alfabetu")
+        print("Wybieraj takie pozycje, aby komputer w końcu nie miał możliwości uniknięcia ciasnego bliźniaka!")
+        print("")
+        print("Przed rozpoczęciem gry masz możliwość:")
+        print("- Zmienić poziom trudności")
+        print("- Zmienić wyświetlanie znaków alfabetu (litery, liczby lub nietypowe")
+        print("- Wybrać ile rund należy wygrać aby wygrać całą grę")
+        print("")
+        print("Rozpoczęcie gry")
+        print("Zaczynając grę musisz wybrać ilość elementów w alfabecie i długość słowa po osiągnięciu której wygra komputer")
+        print("Pierwszy z parametrów ułatwia znacząco grę komputera, poleca jest wartość z zakresu 4-7")
+        print("Drugi parametr wydłuża rozgrywkę i daje więcej możliwości graczowi na osiągnięcie celu bliźniaka")
+        print("")
+        print("Miłej zabawy!")
+        print("")
         input("Wpisz dowolną wartość aby kontynuować...")
 
     def change_settings(self):
